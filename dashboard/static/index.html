@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel X | Command Center</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --panel-bg: #1f2833;
+            --accent-brand: #45a29e;
+            --accent-glow: #66fcf1;
+            --text-main: #c5c6c7;
+            --text-heading: #ffffff;
+            --profit: #2ebd59;
+            --loss: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(102, 252, 241, 0.1);
+            background: linear-gradient(180deg, rgba(11,12,16,1) 0%, rgba(31,40,51,0.5) 100%);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-heading);
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--accent-glow);
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+        }
+
+        .status-badge {
+            background: rgba(46, 189, 89, 0.1);
+            color: var(--profit);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(46, 189, 89, 0.2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--profit);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--profit);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 189, 89, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 189, 89, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 189, 89, 0); }
+        }
+
+        main {
+            flex: 1;
+            padding: 30px 40px;
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 24px;
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(102, 252, 241, 0.2);
+        }
+
+        h2.panel-title {
+            font-size: 18px;
+            color: var(--text-heading);
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--accent-brand);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        /* Metrics */
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-heading);
+        }
+
+        .profit-text { color: var(--profit); }
+        .glow-text { color: var(--accent-glow); text-shadow: 0 0 8px rgba(102,252,241,0.4); }
+
+        /* Terminals */
+        .terminal {
+            background: #000;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #0f0;
+            flex: 1;
+            overflow-y: auto;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 1);
+            border: 1px solid #333;
+        }
+
+        .terminal p { margin-bottom: 5px; opacity: 0.8;}
+        .terminal p.buy { color: var(--profit); }
+        .terminal p.sell { color: var(--loss); }
+        
+        .signal-card {
+            background: rgba(0,0,0,0.2);
+            border-left: 4px solid var(--accent-glow);
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .signal-card:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .signal-card.sell {
+            border-left-color: var(--loss);
+        }
+
+        .signal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .signal-card strong {
+            font-size: 16px;
+            color: white;
+        }
+        
+        .conf-badge {
+            background: rgba(102, 252, 241, 0.1);
+            color: var(--accent-glow);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-top: 6px;
+        }
+
+        .signal-details {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 12px;
+            color: #888;
+        }
+
+        .signal-details.open {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .detail-item span {
+            display: block;
+            color: white;
+            font-weight: 600;
+            margin-top: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            SENTINEL <span>X</span>
+        </div>
+        <div class="status-badge" id="botStatus">
+            <div class="status-dot"></div>
+            SYSTEM ACTIVE
+        </div>
+    </header>
+
+    <main>
+        <!-- Left Panel: Stats -->
+        <div class="panel">
+            <h2 class="panel-title">Metrics</h2>
+            <div class="metrics-list" id="metricsList">
+                <div class="metric">
+                    <span class="metric-label">Available Funds</span>
+                    <span class="metric-value glow-text" id="availableFunds">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Portfolio Value</span>
+                    <span class="metric-value" id="portfolioValue">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Daily PnL</span>
+                    <span class="metric-value profit-text" id="dailyPnl">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Active Trades</span>
+                    <span class="metric-value" id="activeTrades">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">ML Confidence Avg</span>
+                    <span class="metric-value glow-text" id="mlConf">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Uptime</span>
+                    <span class="metric-value" id="uptime">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Panel: Terminal -->
+        <div class="panel" style="flex: 2;">
+            <h2 class="panel-title">Live Execution Engine</h2>
+            <div class="terminal" id="terminalLog">
+                <p>> System initialized. ML Pipeline loaded.</p>
+                <p>> Polling 1-min candles...</p>
+            </div>
+        </div>
+
+        <!-- Right Panel: Signals -->
+        <div class="panel">
+            <h2 class="panel-title">Agent Signals</h2>
+            <div id="signalsList" style="display:flex; flex-direction:column; gap:10px;">
+                <!-- Filled via JS -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function fetchStatus() {
+            try {
+                const res = await fetch('/api/status');
+                const data = await res.json();
+                document.getElementById('availableFunds').innerText = data.available_funds || '₹ 0.00';
+                document.getElementById('portfolioValue').innerText = data.portfolio_value || '₹ 0.00';
+                document.getElementById('dailyPnl').innerText = data.daily_pnl;
+                document.getElementById('activeTrades').innerText = data.active_trades;
+                document.getElementById('mlConf').innerText = data.ml_agent_confidence;
+                document.getElementById('uptime').innerText = data.uptime;
+            } catch (e) {
+                console.error("Dashboard error", e);
+            }
+        }
+
+        async function fetchSignals() {
+            try {
+                const res = await fetch('/api/signals');
+                const data = await res.json();
+                const container = document.getElementById('signalsList');
+                // Only rewrite if changed (prevent losing open state on refresh perfectly, but for now simple overwrite)
+                container.innerHTML = '';
+                
+                data.signals.forEach(sig => {
+                    const card = document.createElement('div');
+                    card.className = `signal-card ${sig.direction.toLowerCase()}`;
+                    
+                    const details = sig.details || {};
+                    card.innerHTML = `
+                        <div class="signal-header">
+                            <div>
+                                <strong>${sig.symbol}</strong>
+                                <div><span class="conf-badge">ML CONF: ${(sig.confidence * 100).toFixed(1)}%</span></div>
+                            </div>
+                            <div style="font-weight: 800; font-family:'JetBrains Mono', monospace; font-size:18px; color: ${sig.direction === 'BUY' ? 'var(--profit)' : 'var(--loss)'}">
+                                ${sig.direction}
+                            </div>
+                        </div>
+                        <div class="signal-details">
+                            <div class="detail-item">Strategy <span>${details.strategy || 'Adaptive Engine'}</span></div>
+                            <div class="detail-item">Entry Price <span>${details.entry_price || 'Market'}</span></div>
+                            <div class="detail-item">Trailing SL <span>${details.trailing_sl || 'N/A'}</span></div>
+                            <div class="detail-item">ADX Strength <span>${details.adx_score || '--'}</span></div>
+                        </div>
+                    `;
+                    
+                    // Add click listener to toggle details
+                    card.addEventListener('click', () => {
+                        const detailBox = card.querySelector('.signal-details');
+                        detailBox.classList.toggle('open');
+                    });
+
+                    container.appendChild(card);
+                });
+            } catch(e) {}
+        }
+
+        // Mock Terminal simulation
+        const lines = [
+            "fetching market data from Angel One...",
+            "preprocessing 1-min candle data for 10 symbols...",
+            "MACD crossover detected on RELIANCE-EQ",
+            "Bollinger Band breakout detected on INFY-EQ",
+            "evaluating sentiment... (score: 0.45)",
+            "ML Agent validation: 94% CONFIDENCE. (Threshold: 90%)",
+            "executing BUY order on RELIANCE-EQ...",
+            "order accepted. Risk parameters checked.",
+            "polling 1-min candles..."
+        ];
+
+        let index = 0;
+        function updateTerminal() {
+            const t = document.getElementById('terminalLog');
+            const p = document.createElement('p');
+            p.innerText = `> ${lines[index % lines.length]}`;
+            if(lines[index % lines.length].includes("BUY")) p.className = 'buy';
+            if(lines[index % lines.length].includes("SELL")) p.className = 'sell';
+            t.appendChild(p);
+            t.scrollTop = t.scrollHeight;
+            index++;
+            setTimeout(updateTerminal, Math.random() * 2000 + 1000);
+        }
+
+        // Init
+        fetchStatus();
+        fetchSignals();
+        setTimeout(updateTerminal, 2000);
+        setInterval(fetchStatus, 30000);
+    </script>
+</body>
+</html>

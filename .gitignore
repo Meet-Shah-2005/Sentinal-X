@@ -1,0 +1,34 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+logs/
+*.log
+
+# Database
+*.sqlite3
+trade_history.db
+
+# VS Code
+.vscode/
+
+# Ignore Jupyter notebooks if used for testing
+*.ipynb
+
+# ML Models
+*.pkl
+
+# Databases
+*.sqlite
+trade_history.sqlite

@@ -1,0 +1,13 @@
+{
+    "equities": [
+        "RELIANCE-EQ",
+        "HDFCBANK-EQ",
+        "INFY-EQ",
+        "TCS-EQ",
+        "ICICIBANK-EQ"
+    ],
+    "futures_options": [
+        "NIFTY",
+        "BANKNIFTY"
+    ]
+}
